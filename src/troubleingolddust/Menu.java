@@ -1,4 +1,4 @@
-package slickexample;
+package troubleingolddust;
 
 
 import org.newdawn.slick.Color;
