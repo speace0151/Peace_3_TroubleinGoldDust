@@ -53,8 +53,10 @@ public class Troubleingolddust extends BasicGameState {
     public Item healthpotion, healthpotion1;
     public Item1 speedpotion, speedpotion1;
     public Itemwin gold;
-
-    public Enemy wrangler;
+    public Orb orb;
+    public Enemy wrangler, wrangler1;
+    public Orb magic8ball;
+    public ArrayList<Orb> orbz =  new ArrayList();
     public ArrayList<Enemy> enemiez = new ArrayList();
     public ArrayList<Item> stuff = new ArrayList();
 
@@ -97,6 +99,11 @@ public class Troubleingolddust extends BasicGameState {
 
     public void init(GameContainer gc, StateBasedGame sbg)
             throws SlickException {
+orb = new Orb((int)Player.x, (int) Player.y);
+if(orb.isIsVisible()){
+    orb.orbpic.draw(orb.getX(), orb.getY());
+}
+
 
         gc.setTargetFrameRate(60);
 
@@ -125,7 +132,7 @@ public class Troubleingolddust extends BasicGameState {
         attack = new Animation();
         attack.setAutoUpdate(true);
         
-        
+        for (Enemy e:  enemiez)
         up = new Animation();
 
         up.setAutoUpdate(true);
@@ -225,7 +232,9 @@ public class Troubleingolddust extends BasicGameState {
         wait.addFrame(runningSS.getSprite(2, 14), 733);
 
         wait.addFrame(runningSS.getSprite(3, 14), 733);
-
+if(orb.isIsVisible()){
+    
+}
         // wait.addFrame(runningSS.getSprite(2, 14), 733);
         // wait.addFrame(runningSS.getSprite(5, 14), 333);
         sprite = wait;
@@ -268,6 +277,7 @@ public class Troubleingolddust extends BasicGameState {
                 }
 
             }
+         
 
         }
 
@@ -316,11 +326,13 @@ public class Troubleingolddust extends BasicGameState {
         stuff1.add(speedpotion);
         stuff1.add(speedpotion1);
 
-        gold = new Itemwin(340,200 );
+        gold = new Itemwin(2474,829 );
         stuffwin.add(gold);
-        wrangler = new Enemy(200, 200);
-
+        wrangler = new Enemy(200, 300);
+        wrangler1 = new Enemy (96,1261);
         enemiez.add(wrangler);
+        enemiez.add(wrangler1);
+
         
 
     }
@@ -361,7 +373,11 @@ public class Troubleingolddust extends BasicGameState {
                 //g.draw(i.hitbox);
 
             }
-        }
+                            
+            }
+     
+        
+        
 
         for (Item1 h : stuff1) {
             if (h.isvisible) {
@@ -412,26 +428,37 @@ public class Troubleingolddust extends BasicGameState {
 
                 sprite.update(delta);
 
-                // The lower the delta the slower the sprite will animate.
+               
                 Player.y -= fdelta;
 
             }
 
         } else if (input.isKeyDown(Input.KEY_DOWN)) {
-
             sprite = down;
 
             if (!isBlocked(Player.x, Player.y + SIZE + fdelta)
                     || !isBlocked(Player.x + SIZE - 1, Player.y + SIZE + fdelta)) {
 
                 sprite.update(delta);
-
+                {
                 Player.y += fdelta;
-
+                
+         
+            
+                }
+            
+                
             }
-
+           else if (input.isKeyDown(Input.KEY_SPACE)){
+                    orb.setX((int) Player.x);
+                    orb.setY((int) Player.y);
+                    orb.hitbox.setX(orb.getX());
+                    orb.hitbox.setY(orb.getY());
+                    orb.setIsVisible(!orb.isIsVisible());
+                    orb.setIsVisible(true);
+                    }
         } else if (input.isKeyDown(Input.KEY_LEFT)) {
-
+Player.setdirection = 2;
             sprite = left;
 
             if (!(isBlocked(Player.x - fdelta, Player.y) || isBlocked(Player.x
@@ -447,7 +474,6 @@ public class Troubleingolddust extends BasicGameState {
 
             sprite = right;
 
-            // the boolean-kludge-implementation
             if (cangoright
                     && (!(isBlocked(Player.x + SIZE + fdelta,
                             Player.y) || isBlocked(Player.x + SIZE + fdelta, Player.y
@@ -458,8 +484,7 @@ public class Troubleingolddust extends BasicGameState {
 
                 Player.x += fdelta;
 
-            } // else { System.out.println("Right limit reached: " +
-            // rightlimit);}
+            }
 
         }
 
@@ -469,20 +494,25 @@ public class Troubleingolddust extends BasicGameState {
         for (Item i : stuff) {
 
             if (Player.rect.intersects(i.hitbox)) {
-                //System.out.println("yay");
+
                 if (i.isvisible) {
 
                     Player.health += 10000;
                     i.isvisible = false;
                 }
-
+                }
+        }
+for (Enemy e : enemiez){
+    if (orb.hitbox.intersects(e.rect)){
+        e.isvisible = false;
+  
             }
         }
 
         for (Item1 h : stuff1) {
 
             if (Player.rect.intersects(h.hitbox)) {
-                //System.out.println("yay");
+
                 if (h.isvisible) {
 
                     Player.speed += .1f;
@@ -495,25 +525,23 @@ public class Troubleingolddust extends BasicGameState {
              gold.isvisible = false;
          }
 
-        /*for (Enemy e : enemiez) {
+    
 
-         if (wrangler.rect.intersects(e.hitbox)) {
-         //System.out.println("yay");
-         if (e.isvisible) {
-         //wrangler.speed += .1f;
-         e.isvisible = false;
-                    
-         }
 
-         }
-         }
-         */
-        //Player.health -= counter / 1000;
         if (Player.health <= 0) {
             makevisible();
             sbg.enterState(2, new FadeOutTransition(Color.black), new FadeInTransition(Color.black));
         }
-
+        if(orb.getTimeExists() > 0){
+    if(Player.getdirection()==0){
+    orb.setX((int)Player.x);
+    orb.setY((int)orb.getY()+ 5);
+    
+    
+    }else if (Player.getdirection()==2){
+        
+    }
+    }
     }
 
     public int getID() {
@@ -521,6 +549,7 @@ public class Troubleingolddust extends BasicGameState {
         return 1;
 
     }
+
 
     public void makevisible() {
         for (Item1 h : stuff1) {
@@ -542,7 +571,9 @@ public class Troubleingolddust extends BasicGameState {
 
         return Blocked.blocked[xBlock][yBlock];
 
-        // this could make a better kludge
+
     }
 
 }
+
+
